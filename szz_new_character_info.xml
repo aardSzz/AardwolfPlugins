@@ -7,7 +7,7 @@
 
 <muclient>
 <plugin
-   name="aard_new_character_info"
+   name="szz_new_character_info"
    author="Szzilleriel"
    id="58466f80aec9a14d82f79499"
    language="Lua"
@@ -38,6 +38,32 @@ require "gmcphelper"
 NewChar = "empty"
 Rstring = "@RCle@G/@RMag@G/@RPal@G/@RPsi@G/@RRan@G/@RThi@G/@RWar@G"
 Rdata = "empty"
+local merge_task = {}
+
+function merge_to_left(orig, new)
+   merge_task[orig] = new
+
+   local left = orig
+   while left ~= nil do
+      local right = merge_task[left]
+      for new_key, new_val in pairs(right) do
+         local old_val = left[new_key]
+         if old_val == nil then
+            left[new_key] = new_val
+         else
+            local old_type = type(old_val)
+            local new_type = type(new_val)
+            if (old_type == "table" and new_type == "table") then
+               merge_task[old_val] = new_val
+            else
+               left[new_key] = new_val
+            end
+         end
+      end
+      merge_task[left] = nil
+      left = next(merge_task)
+   end
+end
 
 function New_Character_Info(name, line, wildcards)
 	NewChar = gmcp("char")
@@ -107,9 +133,31 @@ end
 
 function OnPluginBroadcast (msg, id, name, text)
     if (id == '3e7dedbe37e44942dd46d264') then
-       if (text == "char.stats" or text == "char.maxstats" or text == "char.vitals" or text == "char.worth" or text == "char.status" or text == "char.base") then
-          New_Character_Info()
-       end
+		if (text == "char.base") then
+			local cbase = gmcp("char.base")
+			merge_to_left(NewChar, cbase)
+		end
+		if (text == "char.maxstats") then
+			local maxstats = gmcp("char.maxstats")
+			merge_to_left(NewChar, maxstats)
+		end
+		if (text == "char.stats") then
+			local cstats = gmcp("char.stats")
+			merge_to_left(NewChar, cstats)
+		end
+		if (text == "char.status") then
+			local cstatus = gmcp("char.status")
+			merge_to_left(NewChar, cstatus)
+		end
+		if (text == "char.vitals") then
+			local vstats = gmcp("char.vitals")
+			merge_to_left(NewChar, vstats)
+		end
+		if (text == "char.worth") then
+			local worth = gmcp("char.worth")
+			merge_to_left(NewChar, worth)
+		end
+		New_Character_Info()
     end
  end
 
