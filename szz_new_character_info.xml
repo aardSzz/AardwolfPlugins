@@ -15,7 +15,7 @@
    save_state="y"
    date_written="2024-04-18 23:59:12"
    requires="5.07"
-   version="1.02"
+   version="1.03"
    >
 <description trim="y">
 <![CDATA[
@@ -210,8 +210,8 @@ function draw_window(string)
 		)
 	end
 
-	window:clear()
-	window:add_text(string)
+	window:clear(false)
+	window:add_text(string, true)
 end
 ]]>
 </script>
