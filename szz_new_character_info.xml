@@ -15,7 +15,7 @@
    save_state="y"
    date_written="2024-04-18 23:59:12"
    requires="5.07"
-   version="1.03"
+   version="1.04"
    >
 <description trim="y">
 <![CDATA[
@@ -91,6 +91,7 @@ function New_Character_Info(name, line, wildcards)
 	window_builder = window_builder .. "Pri   : " .. string.format("[@W%10s@G]", NewChar.base.class) .. "  Sub    : " .. string.format("[@W%12s@G]", NewChar.base.subclass) .. "\n"
 	window_builder = window_builder .. "Pup   : " .. string.format("[@W%10d@G]", NewChar.base.pups) .. "  Totpup : " .. string.format("[@W%12d@G]", NewChar.base.totpups)
     draw_window(window_builder)
+	window:dress_window("@R" .. NewChar.base.pretitle .. NewChar.base.name .. "@G\n Level:@W " .. NewChar.base.level .. "@G [@WT+" .. NewChar.base.tier .. "@G/@WR+" .. string.len(NewChar.base.classes) .. "@G]")
 end
 
 function processremorts()
