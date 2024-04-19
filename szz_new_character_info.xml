@@ -15,7 +15,7 @@
    save_state="y"
    date_written="2024-04-18 23:59:12"
    requires="5.07"
-   version="1.01"
+   version="1.02"
    >
 <description trim="y">
 <![CDATA[
@@ -67,7 +67,7 @@ end
 
 function New_Character_Info(name, line, wildcards)
 	NewChar = gmcp("char")
-	window_builder = "Str   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.str, NewChar.maxstats.maxstr) .. "    Hp    : " .. string.format("[@W%6d@G/@W%6d@G]", NewChar.vitals.hp, NewChar.maxstats.maxhp) .. "\n"
+	window_builder = "@GStr   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.str, NewChar.maxstats.maxstr) .. "    Hp    : " .. string.format("[@W%6d@G/@W%6d@G]", NewChar.vitals.hp, NewChar.maxstats.maxhp) .. "\n"
 	window_builder = window_builder .. "Int   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.int, NewChar.maxstats.maxint) .. "    Ma    : " .. string.format("[@W%6d@G/@W%6d@G]", NewChar.vitals.mana, NewChar.maxstats.maxmana) .. "\n"
 	window_builder = window_builder .. "Wis   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.wis, NewChar.maxstats.maxwis) .. "    Mv    : " .. string.format("[@W%6d@G/@W%6d@G]", NewChar.vitals.moves, NewChar.maxstats.maxmoves) .. "\n"
 	window_builder = window_builder .. "Dex   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.dex, NewChar.maxstats.maxdex) .. "\n"
