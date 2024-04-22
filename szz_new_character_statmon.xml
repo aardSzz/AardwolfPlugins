@@ -14,7 +14,7 @@
    save_state="y"
    date_written="2024-04-18 23:59:12"
    requires="4.97"
-   version="1.06"
+   version="1.07"
    >
 <description trim="y">
 <![CDATA[
@@ -521,7 +521,7 @@ function New_Character_Update()
 	if (not options.display.showname) then
 		window:dress_window(options.theme.maincolor .. "Level:" .. options.theme.secondcolor .. " " .. NewChar.base.level .. options.theme.maincolor .. " [" .. options.theme.secondcolor .. "T+" .. NewChar.base.tier .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "R+" .. string.len(NewChar.base.classes) .. options.theme.maincolor .. "]")
 	else
-		window:dress_window("@R" .. NewChar.base.pretitle .. NewChar.base.name .. options.theme.maincolor .. "\n Level:" .. options.theme.secondcolor .. " " .. NewChar.base.level .. options.theme.maincolor " [" .. options.theme.secondcolor .. "T+" .. NewChar.base.tier .. options.theme.maincolor "/" .. options.theme.secondcolor .. "R+" .. string.len(NewChar.base.classes) .. options.theme.maincolor .. "]")
+		window:dress_window("@R" .. NewChar.base.pretitle .. NewChar.base.name .. options.theme.maincolor .. "\n Level:" .. options.theme.secondcolor .. " " .. NewChar.base.level .. options.theme.maincolor .. " [" .. options.theme.secondcolor .. "T+" .. NewChar.base.tier .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "R+" .. string.len(NewChar.base.classes) .. options.theme.maincolor .. "]")
 	end
 end
 
