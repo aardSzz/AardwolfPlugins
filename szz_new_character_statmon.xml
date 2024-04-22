@@ -13,8 +13,8 @@
    purpose="Replace old character stats/info window"
    save_state="y"
    date_written="2024-04-18 23:59:12"
-   requires="5.07"
-   version="1.05"
+   requires="4.97"
+   version="1.06"
    >
 <description trim="y">
 <![CDATA[
@@ -44,7 +44,6 @@ require "serialize"
 require "themed_miniwindows"
 
 NewChar = "empty"
-Rstring = "@RCle@G/@RMag@G/@RPal@G/@RPsi@G/@RRan@G/@RThi@G/@RWar@G"
 Rdata = "empty"
 local options = {
 	display = {
@@ -69,6 +68,7 @@ local options = {
 		["background"] = nil
 	}
 }
+Rstring = options.theme.remortoff .. "Cle" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "Mag" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "Pal" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "Psi" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "Ran" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "Thi" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "War" .. options.theme.maincolor
 local merge_task = {}
 
 function merge_to_left(orig, new)
@@ -277,6 +277,112 @@ function New_Character_Statmon(name, line, wildcards)
 			end
 		end
 	end
+    if (arg1:lower() == "maincolor") then
+		if (arg2 ~= nil) then
+			if (not CheckValidColor(arg2)) then
+				PrintThemeHelp()
+				return
+			else
+				options.theme.maincolor = arg2
+				Note ("SzzStatmon: " .. arg1:lower() .. " set to: " .. arg2)
+				SaveNewStatmon()
+				return
+			end
+		end
+	end
+    if (arg1:lower() == "secondcolor") then
+		if (arg2 ~= nil) then
+			if (not CheckValidColor(arg2)) then
+				PrintThemeHelp()
+				return
+			else
+				options.theme.secondcolor = arg2
+				Note ("SzzStatmon: " .. arg1:lower() .. " set to: " .. arg2)
+				SaveNewStatmon()
+				return
+			end
+		end
+	end
+    if (arg1:lower() == "goldcolor") then
+		if (arg2 ~= nil) then
+			if (not CheckValidColor(arg2)) then
+				PrintThemeHelp()
+				return
+			else
+				options.theme.goldcolor = arg2
+				Note ("SzzStatmon: " .. arg1:lower() .. " set to: " .. arg2)
+				SaveNewStatmon()
+				return
+			end
+		end
+	end
+    if (arg1:lower() == "remorton") then
+		if (arg2 ~= nil) then
+			if (not CheckValidColor(arg2)) then
+				PrintThemeHelp()
+				return
+			else
+				options.theme.remorton = arg2
+				Note ("SzzStatmon: " .. arg1:lower() .. " set to: " .. arg2)
+				SaveNewStatmon()
+				return
+			end
+		end
+	end
+    if (arg1:lower() == "remortoff") then
+		if (arg2 ~= nil) then
+			if (not CheckValidColor(arg2)) then
+				PrintThemeHelp()
+				return
+			else
+				options.theme.remortoff = arg2
+				Note ("SzzStatmon: " .. arg1:lower() .. " set to: " .. arg2)
+				SaveNewStatmon()
+				return
+			end
+		end
+	end
+end
+
+function CheckValidColor(string)
+    local valid = false
+    local validmudcolortbl =  { 
+        ["b"] = 1,
+        ["r"] = 2,
+        ["g"] = 3,
+        ["y"] = 4,
+        ["Y"] = 5,
+        ["c"] = 6,
+        ["m"] = 7,
+        ["w"] = 8,
+        ["d"] = 9
+    }
+    local validcolormatch = "@x*%w+"
+    if string.find(string, validcolormatch) then
+        if string.find(string:lower(), "x") then
+            local s = string:gsub("@x", "")
+            if (s == "0") or (s >= "1" and s <= "255") then
+                valid = true
+            end
+        else
+            for k, _ in pairs(validmudcolortbl) do
+                local s = string:gsub("@", "")
+                if (s:lower() == k) then
+                    valid = true
+                end
+                if (valid) then
+                    break
+                end
+            end
+        end
+    else
+        return false
+    end
+    if (valid) then
+        return true
+    else
+        return false
+    end
 end
 
 function CheckValidCommand(string)
@@ -346,16 +452,20 @@ function CheckValidArgument(string)
 end
 
 function PrintHelp()
-	Note("szz_new_statmon by Szzilleriel")
+	Note("szz_new_character_statmon by Szzilleriel")
 	Note("")
 	Note("ncs [showname/showstats/showinfo/showworth/showremorts/showclass/showpups] [on/off/1/0/true/false]")
-	-- Note("ncs [maincolor/secondcolor/goldcolor/remorton/remortoff/background] [mud_color_code] - ie: @G or @x101")
+	Note("ncs [maincolor/secondcolor/goldcolor/remorton/remortoff] [mud_color_code] - ie: @G or @x101")
 	-- Note("ncs [uservi] [on/off/1/0/true/false] - For visually impaired")
 	-- Note("ncs [remortonvi/remortoffvi] [symbol] - ie: ncs remorton + or ncs remortoff -")
 end
 
 function PrintDisplayHelp()
 	Note("Syntax: ncs [showname/showstats/showinfo/showworth/showremorts/showclass/showpups] [on/off/1/0/true/false]")
+end
+
+function PrintThemeHelp()
+    Note("Syntax: ncs [maincolor/secondcolor/goldcolor/remorton/remortoff] [mud_color_code] - ie: @G or @x101")
 end
 
 function New_Character_Update()
@@ -367,29 +477,29 @@ function New_Character_Update()
 	end
 
 	if (options.display.showstats) then
-		window_builder = window_builder .. "@GStr   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.str, NewChar.maxstats.maxstr) .. "    Hp    : " .. string.format("[@W%6d@G/@W%6d@G]", NewChar.vitals.hp, NewChar.maxstats.maxhp) .. "\n"
-		window_builder = window_builder .. "Int   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.int, NewChar.maxstats.maxint) .. "    Ma    : " .. string.format("[@W%6d@G/@W%6d@G]", NewChar.vitals.mana, NewChar.maxstats.maxmana) .. "\n"
-		window_builder = window_builder .. "Wis   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.wis, NewChar.maxstats.maxwis) .. "    Mv    : " .. string.format("[@W%6d@G/@W%6d@G]", NewChar.vitals.moves, NewChar.maxstats.maxmoves) .. "\n"
-		window_builder = window_builder .. "Dex   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.dex, NewChar.maxstats.maxdex) .. "\n"
-		window_builder = window_builder .. "Con   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.con, NewChar.maxstats.maxcon) .. "    HR    : " .. string.format("[@W%5d@G]", NewChar.stats.hr) .. "\n"
-		window_builder = window_builder .. "Luk   : " .. string.format("[@W%3d@G/@W%3d@G]", NewChar.stats.luck, NewChar.maxstats.maxluck) .. "    DR    : " .. string.format("[@W%5d@G]", NewChar.stats.dr) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "Str   : " .. string.format("[" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "]", NewChar.stats.str, NewChar.maxstats.maxstr) .. "    Hp    : " .. string.format("[" .. options.theme.secondcolor .. "%6d" .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "%6d" .. options.theme.maincolor .. "]", NewChar.vitals.hp, NewChar.maxstats.maxhp) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "Int   : " .. string.format("[" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "]", NewChar.stats.int, NewChar.maxstats.maxint) .. "    Ma    : " .. string.format("[" .. options.theme.secondcolor .. "%6d" .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "%6d" .. options.theme.maincolor .. "]", NewChar.vitals.mana, NewChar.maxstats.maxmana) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "Wis   : " .. string.format("[" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "]", NewChar.stats.wis, NewChar.maxstats.maxwis) .. "    Mv    : " .. string.format("[" .. options.theme.secondcolor .. "%6d" .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "%6d" .. options.theme.maincolor .. "]", NewChar.vitals.moves, NewChar.maxstats.maxmoves) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "Dex   : " .. string.format("[" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "]", NewChar.stats.dex, NewChar.maxstats.maxdex) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "Con   : " .. string.format("[" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "]", NewChar.stats.con, NewChar.maxstats.maxcon) .. "    HR    : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.stats.hr) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "Luk   : " .. string.format("[" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "%3d" .. options.theme.maincolor .. "]", NewChar.stats.luck, NewChar.maxstats.maxluck) .. "    DR    : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.stats.dr) .. "\n"
 		window_builder = window_builder .. "\n"
 	end
 
 	if (options.display.showinfo) then
-		window_builder = window_builder .. "TNL   : " .. string.format("[@W%5d@G]", NewChar.status.tnl) .. "      Align : " .. string.format("[@W%5d@G]", NewChar.status.align) .. "\n"
-		window_builder = window_builder .. "Train : " .. string.format("[@W%5d@G]", NewChar.worth.trains) .. "      Prac  : " .. string.format("[@W%5d@G]", NewChar.worth.pracs) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "TNL   : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.status.tnl) .. "      Align : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.status.align) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "Train : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.worth.trains) .. "      Prac  : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.worth.pracs) .. "\n"
     	window_builder = window_builder .. "\n"
 	end
 
 	if (options.display.showworth) then
-		window_builder = window_builder .. "QP    : " .. string.format("[@W%6d@G]", NewChar.worth.qp) .. "     TP    : " .. string.format("[@W%5d@G]", NewChar.worth.tp) .. "\n"
-		window_builder = window_builder .. "            Gold : " .. string.format("[@Y%12d@G]", NewChar.worth.gold) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "QP    : " .. string.format("[" .. options.theme.secondcolor .. "%6d" .. options.theme.maincolor .. "]", NewChar.worth.qp) .. "     TP    : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.worth.tp) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "            Gold : " .. string.format("[" .. options.theme.goldcolor .. "%12d" .. options.theme.maincolor .. "]", NewChar.worth.gold) .. "\n"
 		window_builder = window_builder .. "\n"
 	end
 
 	if (options.display.showremorts) then
-		window_builder = window_builder .. "                   Remorts\n"
+		window_builder = window_builder .. options.theme.maincolor .. "                   Remorts\n"
 		-- Do not hammer cpus with gsub replacements except when needed
 		if not string.find(Rdata, NewChar.base.classes) then
 			Rdata = NewChar.base.classes
@@ -400,56 +510,56 @@ function New_Character_Update()
 	end
 
 	if (options.display.showclass) then
-		window_builder = window_builder .. "Pri   : " .. string.format("[@W%10s@G]", NewChar.base.class) .. "  Sub    : " .. string.format("[@W%12s@G]", NewChar.base.subclass) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "Pri   : " .. string.format("[" .. options.theme.secondcolor .. "%10s" .. options.theme.maincolor .. "]", NewChar.base.class) .. "  Sub    : " .. string.format("[" .. options.theme.secondcolor .. "%12s" .. options.theme.maincolor .. "]", NewChar.base.subclass) .. "\n"
 	end
 
 	if (options.display.showpups) then
-		window_builder = window_builder .. "Pup   : " .. string.format("[@W%10d@G]", NewChar.base.pups) .. "  Totpup : " .. string.format("[@W%12d@G]", NewChar.base.totpups)
+		window_builder = window_builder .. options.theme.maincolor .. "Pup   : " .. string.format("[" .. options.theme.secondcolor .. "%10d" .. options.theme.maincolor .. "]", NewChar.base.pups) .. "  Totpup : " .. string.format("[" .. options.theme.secondcolor .. "%12d" .. options.theme.maincolor .. "]", NewChar.base.totpups)
 	end
 
     draw_window(window_builder)
 	if (not options.display.showname) then
-		window:dress_window("Level:@W " .. NewChar.base.level .. "@G [@WT+" .. NewChar.base.tier .. "@G/@WR+" .. string.len(NewChar.base.classes) .. "@G]")
+		window:dress_window(options.theme.maincolor .. "Level:" .. options.theme.secondcolor .. " " .. NewChar.base.level .. options.theme.maincolor .. " [" .. options.theme.secondcolor .. "T+" .. NewChar.base.tier .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "R+" .. string.len(NewChar.base.classes) .. options.theme.maincolor .. "]")
 	else
-		window:dress_window("@R" .. NewChar.base.pretitle .. NewChar.base.name .. "@G\n Level:@W " .. NewChar.base.level .. "@G [@WT+" .. NewChar.base.tier .. "@G/@WR+" .. string.len(NewChar.base.classes) .. "@G]")
+		window:dress_window("@R" .. NewChar.base.pretitle .. NewChar.base.name .. options.theme.maincolor .. "\n Level:" .. options.theme.secondcolor .. " " .. NewChar.base.level .. options.theme.maincolor " [" .. options.theme.secondcolor .. "T+" .. NewChar.base.tier .. options.theme.maincolor "/" .. options.theme.secondcolor .. "R+" .. string.len(NewChar.base.classes) .. options.theme.maincolor .. "]")
 	end
 end
 
 function processremorts()
 	if string.find(Rdata, "0") then
-		Rstring = string.gsub(Rstring, "@RMag", "@GMag")
+		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Mag", options.theme.remorton .. "Mag")
 	else
-		Rstring = string.gsub(Rstring, "@GMag", "@RMag")
+		Rstring = string.gsub(Rstring, options.theme.remorton .. "Mag", options.theme.remortoff .. "Mag")
 	end
 	if string.find(Rdata, "1") then
-		Rstring = string.gsub(Rstring, "@RCle", "@GCle")
+		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Cle", options.theme.remorton .. "Cle")
 	else
-		Rstring = string.gsub(Rstring, "@GCle", "@RCle")
+		Rstring = string.gsub(Rstring, options.theme.remorton .. "Cle", options.theme.remortoff .. "Cle")
 	end
 	if string.find(Rdata, "2") then
-		Rstring = string.gsub(Rstring, "@RThi", "@GThi")
+		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Thi", options.theme.remorton .. "Thi")
 	else
-		Rstring = string.gsub(Rstring, "@GThi", "@RThi")
+		Rstring = string.gsub(Rstring, options.theme.remorton .. "Thi", options.theme.remortoff .. "Thi")
 	end
 	if string.find(Rdata, "3") then
-		Rstring = string.gsub(Rstring, "@RWar", "@GWar")
+		Rstring = string.gsub(Rstring, options.theme.remortoff .. "War", options.theme.remorton .. "War")
 	else
-		Rstring = string.gsub(Rstring, "@GWar", "@RWar")
+		Rstring = string.gsub(Rstring, options.theme.remorton .. "War", options.theme.remortoff .. "War")
 	end
 	if string.find(Rdata, "4") then
-		Rstring = string.gsub(Rstring, "@RRan", "@GRan")
+		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Ran", options.theme.remorton .. "Ran")
 	else
-		Rstring = string.gsub(Rstring, "@GRan", "@RRan")
+		Rstring = string.gsub(Rstring, options.theme.remorton .. "Ran", options.theme.remortoff .. "Ran")
 	end
 	if string.find(Rdata, "5") then
-		Rstring = string.gsub(Rstring, "@RPal", "@GPal")
+		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Pal", options.theme.remorton .. "Pal")
 	else
-		Rstring = string.gsub(Rstring, "@GPal", "@RPal")
+		Rstring = string.gsub(Rstring, options.theme.remorton .. "Pal", options.theme.remortoff .. "Pal")
 	end
 	if string.find(Rdata, "6") then
-		Rstring = string.gsub(Rstring, "@RPsi", "@GPsi")
+		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Psi", options.theme.remorton .. "Psi")
 	else
-		Rstring = string.gsub(Rstring, "@GPsi", "@RPsi")
+		Rstring = string.gsub(Rstring, options.theme.remorton .. "Psi", options.theme.remortoff .. "Psi")
 	end
 end
 
