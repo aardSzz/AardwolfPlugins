@@ -349,9 +349,9 @@ function PrintHelp()
 	Note("szz_new_statmon by Szzilleriel")
 	Note("")
 	Note("ncs [showname/showstats/showinfo/showworth/showremorts/showclass/showpups] [on/off/1/0/true/false]")
-	Note("ncs [maincolor/secondcolor/goldcolor/remorton/remortoff/background] [mud_color_code] - ie: @G or @x101")
-	Note("ncs [uservi] [on/off/1/0/true/false] - For visually impaired")
-	Note("ncs [remortonvi/remortoffvi] [symbol] - ie: ncs remorton + or ncs remortoff -")
+	-- Note("ncs [maincolor/secondcolor/goldcolor/remorton/remortoff/background] [mud_color_code] - ie: @G or @x101")
+	-- Note("ncs [uservi] [on/off/1/0/true/false] - For visually impaired")
+	-- Note("ncs [remortonvi/remortoffvi] [symbol] - ie: ncs remorton + or ncs remortoff -")
 end
 
 function PrintDisplayHelp()
