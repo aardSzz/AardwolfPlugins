@@ -39,7 +39,7 @@ Replace old character stats/info window with a new one that contains more inform
 <script>
 <![CDATA[
 ---@diagnostic disable: undefined-global, lowercase-global
--- Todo: Fix Stat bug, layouts.
+-- Todo: Add different layouts. Add VI options.
 require "gmcphelper"
 require "serialize"
 require "themed_miniwindows"
