@@ -596,6 +596,7 @@ function OnPluginInstall()
     	options = assert(loadstring("return " .. GetVariable("szzNewStatmon")))()
 	end
 	ColourNote("white", "", "[szz_new_character_statmon] Installed v" .. GetPluginInfo(GetPluginID(), 19))
+	PrintHelp()
 end
 
 function OnPluginDisable()
