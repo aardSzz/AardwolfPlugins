@@ -8,13 +8,13 @@
 <plugin
    name="szz_new_character_statmon"
    author="Szzilleriel"
-   id="58466f80aec9a14d82f79499"
+   id="58466f80aec9a14d82f7949b"
    language="Lua"
    purpose="Replace old character stats/info window"
    save_state="y"
    date_written="2024-04-18 23:59:12"
    requires="4.97"
-   version="1.07"
+   version="1.08"
    >
 <description trim="y">
 <![CDATA[
@@ -39,12 +39,13 @@ Replace old character stats/info window with a new one that contains more inform
 <script>
 <![CDATA[
 ---@diagnostic disable: undefined-global, lowercase-global
--- Todo: Fix Stat bug, Make player name themeable, add commas option to gold.
+-- Todo: Fix Stat bug, layouts.
 require "gmcphelper"
 require "serialize"
 require "themed_miniwindows"
+require "wait"
 
-NewChar = "empty"
+NewChar = { }
 Rdata = "empty"
 local options = {
 	display = {
@@ -55,12 +56,14 @@ local options = {
 		["showremorts"] = true,
 		["showclass"] = true,
 		["showpups"] = true,
+        ["showcommas"] = true,
 		["uservi"] = false,
 		["userlayout"] = 0 -- 0 = Default, 1 = Tall Skinny, 2 = Long Skinny
 	},
 	theme = {
 		["maincolor"] = "@G",
 		["secondcolor"] = "@W",
+        ["namecolor"] = "@R",
 		["goldcolor"] = "@Y",
 		["remorton"] = "@G",
 		["remortonvi"] = "+",
@@ -70,32 +73,6 @@ local options = {
 	}
 }
 Rstring = options.theme.remortoff .. "Cle" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "Mag" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "Pal" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "Psi" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "Ran" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "Thi" .. options.theme.maincolor .. "/" .. options.theme.remortoff .. "War" .. options.theme.maincolor
-local merge_task = {}
-
-function merge_to_left(orig, new)
-   merge_task[orig] = new
-
-   local left = orig
-   while left ~= nil do
-      local right = merge_task[left]
-      for new_key, new_val in pairs(right) do
-         local old_val = left[new_key]
-         if old_val == nil then
-            left[new_key] = new_val
-         else
-            local old_type = type(old_val)
-            local new_type = type(new_val)
-            if (old_type == "table" and new_type == "table") then
-               merge_task[old_val] = new_val
-            else
-               left[new_key] = new_val
-            end
-         end
-      end
-      merge_task[left] = nil
-      left = next(merge_task)
-   end
-end
 
 function New_Character_Statmon(name, line, wildcards)
 	local arg1, arg2 = nil, nil
@@ -257,6 +234,27 @@ function New_Character_Statmon(name, line, wildcards)
 			end
 		end
 	end
+	if (arg1:lower() == "showcommas") then
+		if (arg2 ~= nil) then
+			if (not CheckValidArgument(arg2)) then
+				PrintDisplayHelp()
+				return
+			else
+				if (arg2:lower() == "on" or arg2 == "1" or arg2:lower() == "true") then
+					options.display.showcommas = true
+					Note ("SzzStatmon: " .. arg1:lower() .. " set to on")
+					SaveNewStatmon()
+					return
+				end
+				if (arg2:lower() == "off" or arg2 == "0" or arg2:lower() == "false") then
+					options.display.showcommas = false
+					Note ("SzzStatmon: " .. arg1:lower() .. " set to off")
+					SaveNewStatmon()
+					return
+				end
+			end
+		end
+	end
 	if (arg1:lower() == "uservi") then
 		if (arg2 ~= nil) then
 			if (not CheckValidArgument(arg2)) then
@@ -298,6 +296,19 @@ function New_Character_Statmon(name, line, wildcards)
 				return
 			else
 				options.theme.secondcolor = arg2
+				Note ("SzzStatmon: " .. arg1:lower() .. " set to: " .. arg2)
+				SaveNewStatmon()
+				return
+			end
+		end
+	end
+    if (arg1:lower() == "namecolor") then
+		if (arg2 ~= nil) then
+			if (not CheckValidColor(arg2)) then
+				PrintThemeHelp()
+				return
+			else
+				options.theme.namecolor = arg2
 				Note ("SzzStatmon: " .. arg1:lower() .. " set to: " .. arg2)
 				SaveNewStatmon()
 				return
@@ -396,16 +407,18 @@ function CheckValidCommand(string)
 	    ["showremorts"] = 5,
 	    ["showclass"] = 6,
 		["showpups"] = 7,
-		["uservi"] = 8,
-		["userlayout"] = 9,
-		["maincolor"] = 10,
-		["secondcolor"] = 11,
-		["goldcolor"] = 12,
-		["remorton"] = 13,
-		["reomrtonvi"] = 14,
-		["remortoff"] = 15,
-		["remortoffvi"] = 16,
-		["background"] = 17
+        ["showcommas"] = 8,
+		["uservi"] = 9,
+		["userlayout"] = 10,
+		["maincolor"] = 11,
+		["secondcolor"] = 12,
+        ["namecolor"] = 13,
+		["goldcolor"] = 14,
+		["remorton"] = 15,
+		["reomrtonvi"] = 16,
+		["remortoff"] = 17,
+		["remortoffvi"] = 18,
+		["background"] = 19
 	}
 	if (string ~= nil) then
 		for k, _ in pairs(cmdtbl) do
@@ -432,8 +445,7 @@ function CheckValidArgument(string)
 		["true"] = 3,
 		["false"] = 4,
 		["1"] = 5,
-		["0"] = 6,
-		["2"] = 7
+		["0"] = 6
 	}
 	if (string ~= nil) then
 		for k, _ in pairs(argtbl) do
@@ -450,6 +462,11 @@ function CheckValidArgument(string)
 	else
 		return false
 	end
+end
+
+function formatwithcommas(n)
+  return tostring(math.floor(n)):reverse():gsub("(%d%d%d)","%1,")
+                                :gsub(",(%-?)$","%1"):reverse()
 end
 
 function PrintHelp()
@@ -470,7 +487,6 @@ function PrintThemeHelp()
 end
 
 function New_Character_Update()
-	NewChar = gmcp("char")
 	if (not options.display.showname) then
 		window_builder = "\n"
 	else
@@ -490,12 +506,17 @@ function New_Character_Update()
 	if (options.display.showinfo) then
 		window_builder = window_builder .. options.theme.maincolor .. "TNL   : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.status.tnl) .. "      Align : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.status.align) .. "\n"
 		window_builder = window_builder .. options.theme.maincolor .. "Train : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.worth.trains) .. "      Prac  : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.worth.pracs) .. "\n"
-    	window_builder = window_builder .. "\n"
+   		window_builder = window_builder .. "\n"
 	end
 
 	if (options.display.showworth) then
+        if (options.display.showcommas) then
+           	gold = formatwithcommas(NewChar.worth.gold)
+        else
+           	gold = NewChar.worth.gold
+       	end
 		window_builder = window_builder .. options.theme.maincolor .. "QP    : " .. string.format("[" .. options.theme.secondcolor .. "%6d" .. options.theme.maincolor .. "]", NewChar.worth.qp) .. "     TP    : " .. string.format("[" .. options.theme.secondcolor .. "%5d" .. options.theme.maincolor .. "]", NewChar.worth.tp) .. "\n"
-		window_builder = window_builder .. options.theme.maincolor .. "            Gold : " .. string.format("[" .. options.theme.goldcolor .. "%12d" .. options.theme.maincolor .. "]", NewChar.worth.gold) .. "\n"
+		window_builder = window_builder .. options.theme.maincolor .. "Gold  : " .. string.format("[" .. options.theme.goldcolor .. "%16s" .. options.theme.maincolor .. "]", tostring(gold)) .. "\n"
 		window_builder = window_builder .. "\n"
 	end
 
@@ -518,79 +539,42 @@ function New_Character_Update()
 		window_builder = window_builder .. options.theme.maincolor .. "Pup   : " .. string.format("[" .. options.theme.secondcolor .. "%10d" .. options.theme.maincolor .. "]", NewChar.base.pups) .. "  Totpup : " .. string.format("[" .. options.theme.secondcolor .. "%12d" .. options.theme.maincolor .. "]", NewChar.base.totpups)
 	end
 
-    draw_window(window_builder)
+   	draw_window(window_builder)
 	if (not options.display.showname) then
 		window:dress_window(options.theme.maincolor .. "Level:" .. options.theme.secondcolor .. " " .. NewChar.base.level .. options.theme.maincolor .. " [" .. options.theme.secondcolor .. "T+" .. NewChar.base.tier .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "R+" .. string.len(NewChar.base.classes) .. options.theme.maincolor .. "]")
 	else
-		window:dress_window("@R" .. NewChar.base.pretitle .. NewChar.base.name .. options.theme.maincolor .. "\n Level:" .. options.theme.secondcolor .. " " .. NewChar.base.level .. options.theme.maincolor .. " [" .. options.theme.secondcolor .. "T+" .. NewChar.base.tier .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "R+" .. string.len(NewChar.base.classes) .. options.theme.maincolor .. "]")
+		window:dress_window(options.theme.namecolor .. NewChar.base.pretitle .. NewChar.base.name .. options.theme.maincolor .. "\n Level:" .. options.theme.secondcolor .. " " .. NewChar.base.level .. options.theme.maincolor .. " [" .. options.theme.secondcolor .. "T+" .. NewChar.base.tier .. options.theme.maincolor .. "/" .. options.theme.secondcolor .. "R+" .. string.len(NewChar.base.classes) .. options.theme.maincolor .. "]")
 	end
 end
 
 function processremorts()
-	if string.find(Rdata, "0") then
-		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Mag", options.theme.remorton .. "Mag")
-	else
-		Rstring = string.gsub(Rstring, options.theme.remorton .. "Mag", options.theme.remortoff .. "Mag")
-	end
-	if string.find(Rdata, "1") then
-		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Cle", options.theme.remorton .. "Cle")
-	else
-		Rstring = string.gsub(Rstring, options.theme.remorton .. "Cle", options.theme.remortoff .. "Cle")
-	end
-	if string.find(Rdata, "2") then
-		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Thi", options.theme.remorton .. "Thi")
-	else
-		Rstring = string.gsub(Rstring, options.theme.remorton .. "Thi", options.theme.remortoff .. "Thi")
-	end
-	if string.find(Rdata, "3") then
-		Rstring = string.gsub(Rstring, options.theme.remortoff .. "War", options.theme.remorton .. "War")
-	else
-		Rstring = string.gsub(Rstring, options.theme.remorton .. "War", options.theme.remortoff .. "War")
-	end
-	if string.find(Rdata, "4") then
-		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Ran", options.theme.remorton .. "Ran")
-	else
-		Rstring = string.gsub(Rstring, options.theme.remorton .. "Ran", options.theme.remortoff .. "Ran")
-	end
-	if string.find(Rdata, "5") then
-		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Pal", options.theme.remorton .. "Pal")
-	else
-		Rstring = string.gsub(Rstring, options.theme.remorton .. "Pal", options.theme.remortoff .. "Pal")
-	end
-	if string.find(Rdata, "6") then
-		Rstring = string.gsub(Rstring, options.theme.remortoff .. "Psi", options.theme.remorton .. "Psi")
-	else
-		Rstring = string.gsub(Rstring, options.theme.remorton .. "Psi", options.theme.remortoff .. "Psi")
-	end
+    local classtbl = {
+        ["Mag"] = 0,
+        ["Cle"] = 1,
+        ["Thi"] = 2,
+        ["War"] = 3,
+        ["Ran"] = 4,
+        ["Pal"] = 5,
+        ["Psi"] = 6
+    }
+    for c, i in pairs(classtbl) do
+        if (string.find(NewChar.base.classes, i)) then
+            Rstring = string.gsub(Rstring, options.theme.remortoff .. c, options.theme.remorton .. c)
+        else
+            Rstring = string.gsub(Rstring, options.theme.remorton .. c, options.theme.remortoff .. c)
+        end
+    end
 end
 
 function OnPluginBroadcast (msg, id, name, text)
     if (id == '3e7dedbe37e44942dd46d264') then
-		if (text == "char.base") then
-			local cbase = gmcp("char.base")
-			merge_to_left(NewChar, cbase)
+		if (text == "char.base" or text == "char.maxstats" or text == "char.stats" or text == "char.status" or text == "char.vitals" or text == "char.worth") then
+			NewChar = gmcp("char")
 		end
-		if (text == "char.maxstats") then
-			local maxstats = gmcp("char.maxstats")
-			merge_to_left(NewChar, maxstats)
-		end
-		if (text == "char.stats") then
-			local cstats = gmcp("char.stats")
-			merge_to_left(NewChar, cstats)
-		end
-		if (text == "char.status") then
-			local cstatus = gmcp("char.status")
-			merge_to_left(NewChar, cstatus)
-		end
-		if (text == "char.vitals") then
-			local vstats = gmcp("char.vitals")
-			merge_to_left(NewChar, vstats)
-		end
-		if (text == "char.worth") then
-			local worth = gmcp("char.worth")
-			merge_to_left(NewChar, worth)
-		end
-		New_Character_Update()
+		wait.make(function()
+			wait.time(1)
+			New_Character_Update()
+		end)
     end
  end
 
@@ -600,17 +584,17 @@ function SaveNewStatmon()
 end
 
  function OnPluginEnable()
+	NewChar = gmcp("char")
 	if GetVariable("szzNewStatmon") then
     	options = assert(loadstring("return " .. GetVariable("szzNewStatmon")))()
 	end
-	New_Character_Update()
 end
 
 function OnPluginInstall()
+	NewChar = gmcp("char")
 	if GetVariable("szzNewStatmon") then
     	options = assert(loadstring("return " .. GetVariable("szzNewStatmon")))()
 	end
-	New_Character_Update()
 	ColourNote("white", "", "[szz_new_character_statmon] Installed v" .. GetPluginInfo(GetPluginID(), 19) .. "b")
 end
 
