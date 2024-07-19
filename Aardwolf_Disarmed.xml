@@ -112,7 +112,7 @@ end
 
 function Aardwolf_Disarmed_PrintHelp()
     DoAfterSpecial(1, 'Note (" ")', 12) 
-    DoAfterSpecial(1, 'Note ("Aardwolf_Disarmed by Szzilleriel v1.01")', 12)
+    DoAfterSpecial(1, 'Note ("Aardwolf_Disarmed by Szzilleriel")', 12)
     DoAfterSpecial(1, 'Note ("---------------------------------------")', 12)
     DoAfterSpecial(1, 'Note ("weaponset [keyword|keywords here]")', 12)
     DoAfterSpecial(1, 'Note (" ")', 12)
