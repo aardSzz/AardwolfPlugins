@@ -139,9 +139,9 @@ function Aardwolf_Disarmed_WeaponDisplay(name, line, wildcards)
 end
 
 function Aardwolf_Disarmed_WeaponSet(name, line, wildcards)
-        options.weaponset.WeaponKeyword = wildcards.keyword
-        Aardwolf_Disarmed_Save()
-        Note("Weapon Keyword(s) set to: " .. wildcards.keyword)
+    options.weaponset.WeaponKeyword = wildcards.keyword
+    Aardwolf_Disarmed_Save()
+    Note("Weapon Keyword(s) set to: " .. wildcards.keyword)
 end
 
 function Aardwolf_Disarmed_Save()
