@@ -15,7 +15,7 @@
    save_state="y"
    date_written="2024-07-19 09:55:13"
    requires="4.97"
-   version="1.01"
+   version="1.02"
    >
 <description trim="y">
 <![CDATA[
@@ -125,13 +125,13 @@ end
 
 function Aardwolf_Disarmed_Wield(name, line, wildcards)
     Send("wield " .. options.weaponset.WeaponKeyword)
-    ColorNote("white", "red", "[Aardwolf_Disarmed]: We were DISARMED to inventory. Wielding weapon.")
+    ColourNote("white", "red", "[Aardwolf_Disarmed]: We were DISARMED to inventory. Wielding weapon.")
 end
 
 function Aardwolf_Disarmed_GetWield(name, line, wildcards)
     Send("get " .. options.weaponset.WeaponKeyword)
     Send("wield " .. options.weaponset.WeaponKeyword)
-    ColorNote("white", "red", "[Aardwolf_Disarmed]: We were DISARMED to ground. Getting, then wielding weapon.")
+    ColourNote("white", "red", "[Aardwolf_Disarmed]: We were DISARMED to ground. Getting, then wielding weapon.")
 end
 
 function Aardwolf_Disarmed_WeaponDisplay(name, line, wildcards)
