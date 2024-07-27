@@ -23,7 +23,7 @@ Get your portal out and id it. Copy the id. Put it back where you keep it. Use t
 
 szz_new_character_statmon.xml
 -------------------------------
-[THEMEABLE, CUSTOMIZABLE] 
+[THEMEABLE, CUSTOMIZABLE] (REQUIRES: AardMush, GMCP)
 -------------------------------
 Replaces the default aard_statmon_gmcp.xml with a newer spiffier looking gmcp version with more info. ('ncs help' in game for more info.) 
 
