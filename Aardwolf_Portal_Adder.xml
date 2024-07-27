@@ -41,27 +41,6 @@ addportal portalid# -- automatically completes all steps required to add portal 
   </alias>
 </aliases>
 
-<!--  Variables  -->
-
-<variables>
-  <variable name="psispell">Desolation</variable>
-  <variable name="enchantranks">@g[@G(@WPolished@G)(@WEnhanced@G)(@WBurnished@G)(@WShiny@G)(@WVibrant@G)(@WSparkling@G)(@WGleaming@G)(@WShimmering@G)(@WDazzling@G)(@WBrilliant@G)@g]] @r[[@R(@WRadiant@R)(@WWondrous@R(@WMajestic@R)(@WExalted@R(@WEternal@R)@r]] @y[[@Y(@WLegendary@Y(@WEpic@Y)(@WMythical@Y)(@WFabled@Y(@WDivine@Y)@y]] @r[[@R((@WGodly@R))@r]]</variable>
-  <variable name="akStatus">0</variable>
-  <variable name="skinType">helm</variable>
-  <variable name="movePotion">mv90</variable>
-  <variable name="WeaponKeyword">dagger</variable>
-  <variable name="myPant">are on fire</variable>
-  <variable name="bagPotion">potbag</variable>
-  <variable name="szzbotlogo">@x046O@x040==@x034{=@x028Sz@x022zB@x028ot@x034=&gt; $C</variable>
-  <variable name="akTarget"></variable>
-  <variable name="blackedup">0</variable>
-  <variable name="akPoisoned">0</variable>
-  <variable name="SlopesLeader">saraid</variable>
-  <variable name="manaPotion">mp201</variable>
-  <variable name="blVar2">@g[@G(@W1 - Polished@G)(@W2 - Enhanced@G)(@W3 - Burnished@G)(@W4 - Shiny@G)(@W5 - Vibrant@G)(@W6 - Sparkling@G)(@W7 - Gleaming@G)(@W8 - Shimmering@G)(@W9 - Dazzling@G)(@W10 - Brilliant@G)@g] @r[@R(@W11 - Radiant@R)(@W12 - Wondrous@R)(@W13 - Majestic@R)(@W14 - Exalted@R)(@W15 - Eternal@R)@r] @y[@Y(@W16 - Legendary@Y)(@W17 - Epic@Y)(@W18 - Mythical@Y)(@W19 - Fabled@Y)(@W20 - Divine@Y)@y] @r[@W((@R21 - Godly@W))@r]</variable>
-  <variable name="healPotion">hp201</variable>
-</variables>
-
 <!--  Script  -->
 
 
