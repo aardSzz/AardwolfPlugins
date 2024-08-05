@@ -9,7 +9,7 @@
 
 # Aardwolf_Portal_Adder.xml 
 ### [NO WINDOW] (REQUIRES: AardMush, dinv plugin) 
-###### addportal portalid# 
+##### addportal portalid# 
 
 ###### Get your portal out and id it. Copy the id. Put it back where you keep it. Use the command addportal id# and it'll take all steps to add your portal to mapper managing it with dinv.
 
