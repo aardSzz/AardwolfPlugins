@@ -139,7 +139,7 @@ function Aardwolf_Disarmed_Wield_Script(name, line, wildcards)
         ColourNote("white", "red", "[Aardwolf_Disarmed - Primary]: We were DISARMED to inventory by a script. Wielding weapon.")
     end
     if wildcards.hand:lower() == "off" then
-        Send("wield " .. options.weaponset.secondary.keyword)
+        Send("second " .. options.weaponset.secondary.keyword)
         ColourNote("white", "red", "[Aardwolf_Disarmed - Secondary]: We were DISARMED to inventory by a script. Wielding weapon.")
     end
 end
